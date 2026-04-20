@@ -1,0 +1,5 @@
+objs
+*.o
+*.a
+.vscode
+ft_ssl

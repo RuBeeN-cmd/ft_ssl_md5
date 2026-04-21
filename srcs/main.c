@@ -1,5 +1,4 @@
 #include <ft_ssl_md5.h>
-#include <parsing.h>
 
 int main(int argc, char *argv[])
 {
@@ -9,6 +8,9 @@ int main(int argc, char *argv[])
 	if (parse_args(argc, argv, &params) != 0)
 		return (1);
 
-	free(params.stdin.input);
+	process_hashes(&params);
+	
+	if (params.stdin.input)
+		free(params.stdin.input);
 	return (0);
 }

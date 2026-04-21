@@ -49,7 +49,7 @@ typedef struct s_flag
 
 // --------------------- STDIN ----------------------
 
-#define	MAX_READ	512
+#define	MAX_READ	4096
 #define	MAX_STRING	32
 #define	MAX_FILES 	32
 

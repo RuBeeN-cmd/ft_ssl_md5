@@ -17,32 +17,20 @@ typedef enum e_log_level {
 #define WARN_PREFIX	"WRN"
 #define ERR_PREFIX	"ERR"
 
-#define LOG(_level_, _format_, ...) do { \
+#define LOG(_is_prefix_, _level_, _format_, ...) do { \
 	if (_level_ >= *get_log_level()) { \
-		switch (_level_) \
-		{ \
-			case LEVEL_DEBUG: \
-				ft_printf_fd(1, "%s" _format_, get_log_prefix(LEVEL_DEBUG), ##__VA_ARGS__); \
-				break; \
-			case LEVEL_INFO: \
-				ft_printf_fd(1, "%s" _format_, get_log_prefix(LEVEL_INFO), ##__VA_ARGS__); \
-				break; \
-			case LEVEL_WARNING: \
-				ft_printf_fd(2, "%s" _format_, get_log_prefix(LEVEL_WARNING), ##__VA_ARGS__); \
-				break; \
-			case LEVEL_ERROR: \
-				ft_printf_fd(2, "%s" _format_, get_log_prefix(LEVEL_ERROR), ##__VA_ARGS__); \
-				break; \
-			default: \
-				break; \
+		if (_level_ <= LEVEL_ERROR) { \
+			char *_prefix_ = _is_prefix_ ? get_log_prefix(_level_) : ""; \
+			int _fd_ = _level_ >= LEVEL_WARNING ? 2 : 1; \
+			ft_printf_fd(_fd_, "%s" _format_, _prefix_, ##__VA_ARGS__); \
 		} \
 	} \
 } while(0)
 
-#define DBG(_format_, ...) LOG(LEVEL_DEBUG, _format_, ##__VA_ARGS__)
-#define INFO(_format_, ...) LOG(LEVEL_INFO, _format_, ##__VA_ARGS__)
-#define WARN(_format_, ...) LOG(LEVEL_WARNING, _format_, ##__VA_ARGS__)
-#define ERR(_format_, ...) LOG(LEVEL_ERROR, _format_, ##__VA_ARGS__)
+#define DBG(_format_, ...) LOG(1, LEVEL_DEBUG, _format_, ##__VA_ARGS__)
+#define INFO(_format_, ...) LOG(1, LEVEL_INFO, _format_, ##__VA_ARGS__)
+#define WARN(_format_, ...) LOG(1, LEVEL_WARNING, _format_, ##__VA_ARGS__)
+#define ERR(_format_, ...) LOG(1, LEVEL_ERROR, _format_, ##__VA_ARGS__)
 
 t_log_level *get_log_level();
 void		set_log_level(t_log_level level);

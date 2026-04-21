@@ -8,9 +8,10 @@ int main(int argc, char *argv[])
 	if (parse_args(argc, argv, &params) != 0)
 		return (1);
 
-	process_hashes(&params);
-	
-	if (params.stdin.input)
-		free(params.stdin.input);
+	int endian = get_endian();
+	DBG("System is %s Endian\n", endian == LITTLE_ENDIAN ? "Little" : "Big");
+
+	process_params(&params, endian);
+
 	return (0);
 }

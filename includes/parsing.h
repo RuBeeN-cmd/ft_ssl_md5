@@ -7,7 +7,6 @@
 #include <utils/log.h>
 #include <libft.h>
 
-
 #define USAGE(program_name) ERR("Usage: %s <command> [flags] [file/string]\n", program_name)
 
 // ---------------------- COMMANDS -------------------
@@ -53,11 +52,11 @@ typedef struct s_flag
 #define	MAX_STRING	32
 #define	MAX_FILES 	32
 
-typedef struct s_stdin
+typedef struct s_input
 {
-	uint8_t	*input;
-	size_t	input_size;
-} t_stdin;
+	uint8_t	*content;
+	size_t	size;
+} t_input;
 
 typedef struct s_params
 {
@@ -66,7 +65,6 @@ typedef struct s_params
 	size_t	string_nb;
 	char 	*files[MAX_FILES];
 	size_t	file_nb;
-	t_stdin	stdin;
 	void	(*hash_algorithm)(void);
 } t_params;
 

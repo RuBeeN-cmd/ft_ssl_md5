@@ -18,9 +18,12 @@ SRC = main.c \
 	utils/log.c \
 	parsing/args.c \
 	parsing/dbg.c \
+	workflow.c \
+	read.c \
+	block.c \
 	md5.c \
 	sha256.c \
-	block.c
+	endian.c
 
 CC = clang
 CFLAGS = -Wall -Werror -Wextra

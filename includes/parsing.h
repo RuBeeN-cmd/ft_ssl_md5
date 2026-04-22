@@ -1,10 +1,8 @@
 #ifndef PARSING_H
 #define PARSING_H
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include <utils/log.h>
+#include <utils/u8_array.h>
 #include <libft.h>
 
 #include <algorithms/md5.h>
@@ -48,12 +46,6 @@ typedef struct s_flag
 #define	MAX_STRING	32
 #define	MAX_FILES 	32
 
-typedef struct s_input
-{
-	uint8_t	*content;
-	size_t	size;
-} t_input;
-
 typedef struct s_params
 {
 	uint8_t		options;
@@ -65,7 +57,6 @@ typedef struct s_params
 } t_params;
 
 int	parse_args(int argc, char *argv[], t_params *params);
-
 
 // ---- DBG
 

@@ -11,7 +11,7 @@
 
 int sha256_handler(uint8_t *blocks, size_t block_nb, uint8_t **hash, size_t *hash_size)
 {
-	INFO("SHA256 command executed\n");
+	DBG("SHA256 command executed\n");
 	if (!hash || !hash_size)
 		return (1);
 

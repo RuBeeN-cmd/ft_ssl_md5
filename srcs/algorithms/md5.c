@@ -7,7 +7,7 @@
 
 int md5_handler(uint8_t *blocks, size_t block_nb, uint8_t **hash, size_t *hash_size)
 {
-    INFO("MD5 command executed\n");
+    DBG("MD5 command executed\n");
 	if (!hash || !hash_size)
 		return (1);
 

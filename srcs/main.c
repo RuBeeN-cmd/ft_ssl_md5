@@ -4,7 +4,12 @@ int main(int argc, char *argv[])
 {
 	t_params	params = {};
 
-	set_log_level(LEVEL_DEBUG);
+	set_log_level(LEVEL_INFO);
+
+	#ifdef NOLOG
+		disable_prefix();
+	#endif
+
 	if (parse_args(argc, argv, &params) != 0)
 		return (1);
 

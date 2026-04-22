@@ -1,11 +1,12 @@
 #include <parsing.h>
 
-void	(*parse_command(char *cmd))(uint8_t*, size_t) {
+int parse_command(char *cmd, t_command *command) {
 	t_command commands[COMMAND_NB] = COMMANDS;
 
 	for (size_t i = 0; i < COMMAND_NB; i++) {
 		if (ft_strncmp(cmd, commands[i].name, ft_strlen(commands[i].name)) == 0) {
-			return (commands[i].hash_algorithm);
+			*command = commands[i];
+			return (0);
 		}
 	}
 	ERR("ft_ssl: Error: %s is an invalid command.\n", cmd);
@@ -25,7 +26,7 @@ void	(*parse_command(char *cmd))(uint8_t*, size_t) {
 	ERR("\n");
 	ERR("Flags:\n");
 	ERR("%s\n", flags_str);
-	return (NULL);
+	return (1);
 }
 
 int	match_flag(char flag)
@@ -94,8 +95,7 @@ int	parse_args(int argc, char *argv[], t_params *params)
 		return (1);
 	}
 
-	params->hash_algorithm = parse_command(argv[1]);
-	if (!params->hash_algorithm)
+	if (parse_command(argv[1], &params->hash_command) != 0)
 		return (1);
 
 	DBG("Running command "ANSI_GREEN"%s"ANSI_RESET"\n", argv[1]);

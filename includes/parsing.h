@@ -16,14 +16,15 @@ void	sha256_handler(uint8_t*, size_t);
 
 #define COMMAND_NB 2
 #define COMMANDS { \
-	(t_command) {"md5", md5_handler}, \
-	(t_command) {"sha256", sha256_handler} \
+	(t_command) {"md5", md5_handler, LITTLE_ENDIAN}, \
+	(t_command) {"sha256", sha256_handler, BIG_ENDIAN} \
 }
 
 typedef struct s_command
 {
 	char	*name;
 	void	(*hash_algorithm)(uint8_t*, size_t);
+	int		block_endian;
 }	t_command;
 
 // --------------------- FLAGS ----------------------
@@ -60,12 +61,12 @@ typedef struct s_input
 
 typedef struct s_params
 {
-	uint8_t	options;
-	char 	*strings[MAX_STRING];
-	size_t	string_nb;
-	char 	*files[MAX_FILES];
-	size_t	file_nb;
-	void	(*hash_algorithm)(uint8_t*, size_t);
+	uint8_t		options;
+	char 		*strings[MAX_STRING];
+	size_t		string_nb;
+	char 		*files[MAX_FILES];
+	size_t		file_nb;
+	t_command	hash_command;
 } t_params;
 
 // --------------------------------------------------

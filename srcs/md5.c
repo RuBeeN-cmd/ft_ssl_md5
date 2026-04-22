@@ -5,7 +5,6 @@
 #define H(b, c, d) (b ^ c ^ d)
 #define I(b, c, d) (c ^ (b | ~d))
 
-
 void md5_handler(uint8_t *blocks, size_t block_nb)
 {
     INFO("MD5 command executed\n");

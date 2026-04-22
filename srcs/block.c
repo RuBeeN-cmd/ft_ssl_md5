@@ -13,7 +13,7 @@ void	dbg_print_blocks(uint8_t *block, size_t block_nb)
 	}
 }
 
-int get_blocks(t_input input, uint8_t **blocks, size_t *block_nb) {
+int get_blocks(t_input input, uint8_t **blocks, size_t *block_nb, int block_endian) {
 	if (input.content == NULL || input.size == 0)
 		return (1);
 	*block_nb = (input.size + MIN_PADDING_SIZE + LEN_SIZE - 1) / BLOCK_SIZE + 1;
@@ -24,7 +24,7 @@ int get_blocks(t_input input, uint8_t **blocks, size_t *block_nb) {
 
 	(*blocks)[input.size] = 0x80;
 	uint64_t	len = input.size * 8;
-	SWAP_ENDIAN(LITTLE_ENDIAN, len, 8);
+	SWAP_ENDIAN(block_endian, len, 8);
 	*((uint64_t *) ((*blocks) + *block_nb * BLOCK_SIZE - LEN_SIZE)) = len;
 	return (0);
 }

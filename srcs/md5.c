@@ -1,4 +1,5 @@
 #include <ft_ssl_md5.h>
+#include <calculus.h>
 
 #define F(b, c, d) ((b & c) | (~b & d))
 #define G(b, c, d) ((b & d) | (c & ~d))
@@ -70,7 +71,7 @@ void md5_handler(uint8_t *blocks, size_t block_nb)
             h1[3] = h1[2];
             h1[2] = h1[1];
 			h1[1] = h1[0] + f + k[j] + m[g];
-            h1[1] = (h1[1] << r[r_index]) | (h1[1] >> (32 - r[r_index]));
+            h1[1] = ROTLEFT32(h1[1], r[r_index]);
             h1[1] += h1[2];
             h1[0] = temp;
         }
@@ -78,13 +79,6 @@ void md5_handler(uint8_t *blocks, size_t block_nb)
         for (size_t j = 0; j < 4; j++)
             h[j] += h1[j];
     }
-
-    for (size_t j = 0; j < 4; j++)
-    {
-        h[j] = ((h[j] & 0xFF000000) >> 24) |
-               ((h[j] & 0x00FF0000) >>  8) |
-               ((h[j] & 0x0000FF00) <<  8) |
-               ((h[j] & 0x000000FF) << 24);
-    }
+    SWAP_ENDIAN_ARRAY(BIG_ENDIAN, h, 4, 4);
     INFO("MD5 hash: %x%x%x%x \n", h[0], h[1], h[2], h[3]);
 }

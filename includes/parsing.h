@@ -12,8 +12,6 @@
 
 #define USAGE(program_name) ERR("Usage: %s <command> [flags] [file/string]\n", program_name)
 
-// ---------------------- COMMANDS -------------------
-
 #define COMMAND_NB 2
 #define COMMANDS { \
 	(t_command) {MD5_NAME, md5_handler, LITTLE_ENDIAN, MD5_HASH_SIZE}, \
@@ -27,8 +25,6 @@ typedef struct s_command
 	int		block_endian;
 	int		hash_size;
 }	t_command;
-
-// --------------------- FLAGS ----------------------
 
 #define FLAG_NB 4
 #define FLAGS { \
@@ -47,8 +43,6 @@ typedef struct s_flag
 	char	name;
 	uint8_t	mask;
 }	t_flag;
-
-// --------------------- STDIN ----------------------
 
 #define	MAX_READ	4096
 #define	MAX_STRING	32
@@ -69,8 +63,6 @@ typedef struct s_params
 	size_t		file_nb;
 	t_command	hash_command;
 } t_params;
-
-// --------------------------------------------------
 
 int	parse_args(int argc, char *argv[], t_params *params);
 

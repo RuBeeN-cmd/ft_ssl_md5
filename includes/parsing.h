@@ -7,24 +7,25 @@
 #include <utils/log.h>
 #include <libft.h>
 
+#include <algorithms/md5.h>
+#include <algorithms/sha256.h>
+
 #define USAGE(program_name) ERR("Usage: %s <command> [flags] [file/string]\n", program_name)
 
 // ---------------------- COMMANDS -------------------
 
-void	md5_handler(uint8_t*, size_t);
-void	sha256_handler(uint8_t*, size_t);
-
 #define COMMAND_NB 2
 #define COMMANDS { \
-	(t_command) {"md5", md5_handler, LITTLE_ENDIAN}, \
-	(t_command) {"sha256", sha256_handler, BIG_ENDIAN} \
+	(t_command) {MD5_NAME, md5_handler, LITTLE_ENDIAN, MD5_HASH_SIZE}, \
+	(t_command) {SHA256_NAME, sha256_handler, BIG_ENDIAN, SHA256_HASH_SIZE} \
 }
 
 typedef struct s_command
 {
 	char	*name;
-	void	(*hash_algorithm)(uint8_t*, size_t);
+	int		(*hash_algorithm)(uint8_t*, size_t, uint8_t**, size_t*);
 	int		block_endian;
+	int		hash_size;
 }	t_command;
 
 // --------------------- FLAGS ----------------------

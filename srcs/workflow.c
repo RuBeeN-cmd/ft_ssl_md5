@@ -1,5 +1,17 @@
 #include <ft_ssl_md5.h>
 
+void	print_hash(void *hash, size_t hash_size)
+{
+	if (!hash || hash_size == 0)
+		return;
+	INFO("Hash: ");
+	for (size_t i = 0; i < hash_size; i++)
+	{
+		LOG(0, LEVEL_INFO, "%x", ((uint8_t *)hash)[i]);
+	}
+	LOG(0, LEVEL_INFO, "\n");
+}
+
 int	process_hash(t_command *command, t_input input) {
 	if (input.content == NULL || input.size == 0)
 		return (0);
@@ -9,8 +21,15 @@ int	process_hash(t_command *command, t_input input) {
 		return (1);
 	dbg_print_blocks(blocks, block_nb);
 
-	command->hash_algorithm(blocks, block_nb);
-	
+	void *hash = NULL;
+	size_t hash_size = 0;
+	if (command->hash_algorithm(blocks, block_nb, (uint8_t **) &hash, &hash_size)) {
+		free(blocks);
+		return (1);
+	}
+	print_hash(hash, hash_size);
+	free(hash);
+
 	free(blocks);
 	return (0);
 }

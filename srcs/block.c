@@ -1,4 +1,5 @@
 #include <ft_ssl_md5.h>
+#include <utils/endian.h>
 
 void	dbg_print_blocks(uint8_t *block, size_t block_nb)
 {

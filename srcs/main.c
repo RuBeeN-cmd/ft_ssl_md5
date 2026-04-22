@@ -9,6 +9,5 @@ int main(int argc, char *argv[])
 		return (1);
 
 	process_params(&params);
-
 	return (0);
 }

@@ -1,5 +1,4 @@
-#include <ft_ssl_md5.h>
-#include <calculus.h>
+#include <algorithms/sha256.h>
 
 #define SIGMA0(x) (ROTRIGHT32(x, 7) ^ ROTRIGHT32(x, 18) ^ ((x) >> 3))
 #define SIGMA1(x) (ROTRIGHT32(x, 17) ^ ROTRIGHT32(x, 19) ^ ((x) >> 10))
@@ -10,9 +9,11 @@
 #define CH(x, y, z) ((x) & (y) ^ (~(x) & (z)))
 #define MAJ(x, y, z) ((x) & (y) ^ ((x) & (z) ^ (y) & (z)))
 
-void sha256_handler(uint8_t *blocks, size_t block_nb)
+int sha256_handler(uint8_t *blocks, size_t block_nb, uint8_t **hash, size_t *hash_size)
 {
 	INFO("SHA256 command executed\n");
+	if (!hash || !hash_size)
+		return (1);
 
 	uint32_t k[64] = {
 		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
@@ -47,7 +48,7 @@ void sha256_handler(uint8_t *blocks, size_t block_nb)
     for (size_t i = 0; i < block_nb; i++)
     {
 		uint32_t *m = (uint32_t *)(blocks + i * 64);
-		SWAP_ENDIAN_ARRAY(BIG_ENDIAN, m, 4, 16);
+		SWAP_ENDIAN_ARRAY(SHA256_BLOCK_ENDIAN, m, 4, 16);
 
 		uint32_t W[64] = {0};
 		for (size_t j = 0; j < 64; j++)
@@ -61,8 +62,8 @@ void sha256_handler(uint8_t *blocks, size_t block_nb)
         uint32_t h1[8] = { h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7] };
 		for (size_t j = 0; j < 64; j++)
         {
-			uint32_t t1 = h1[7] + EP0(h1[0]) + CH(h1[4], h1[5], h1[6]) + k[j] + W[j];
-			uint32_t t2 = EP1(h1[4]) + MAJ(h1[0], h1[1], h1[2]);
+			uint32_t t1 = h1[7] + EP1(h1[4]) + CH(h1[4], h1[5], h1[6]) + k[j] + W[j];
+			uint32_t t2 = EP0(h1[0]) + MAJ(h1[0], h1[1], h1[2]);
 
 			h1[7] = h1[6];
 			h1[6] = h1[5];
@@ -78,7 +79,8 @@ void sha256_handler(uint8_t *blocks, size_t block_nb)
         for (size_t j = 0; j < 8; j++)
             h[j] += h1[j];
 	}
-	SWAP_ENDIAN_ARRAY(LITTLE_ENDIAN, h, 4, 8);
-    INFO("SHA256 hash: %x%x%x%x%x%x%x%x \n", h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]);
-
+	SWAP_ENDIAN_ARRAY(SHA256_BLOCK_ENDIAN, h, 4, 8);
+	if (copy_hash(hash, hash_size, (uint8_t *) h, SHA256_HASH_SIZE))
+		return (1);
+	return (0);
 }

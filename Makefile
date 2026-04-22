@@ -21,8 +21,9 @@ SRC = main.c \
 	workflow.c \
 	read.c \
 	block.c \
-	md5.c \
-	sha256.c \
+	algorithms/common.c \
+	algorithms/md5.c \
+	algorithms/sha256.c \
 	endian.c
 
 CC = clang

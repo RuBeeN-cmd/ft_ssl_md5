@@ -1,14 +1,15 @@
-#include <ft_ssl_md5.h>
-#include <calculus.h>
+#include <algorithms/md5.h>
 
 #define F(b, c, d) ((b & c) | (~b & d))
 #define G(b, c, d) ((b & d) | (c & ~d))
 #define H(b, c, d) (b ^ c ^ d)
 #define I(b, c, d) (c ^ (b | ~d))
 
-void md5_handler(uint8_t *blocks, size_t block_nb)
+int md5_handler(uint8_t *blocks, size_t block_nb, uint8_t **hash, size_t *hash_size)
 {
     INFO("MD5 command executed\n");
+	if (!hash || !hash_size)
+		return (1);
 
     uint32_t r[16] = { 7, 12, 17, 22,
                        5,  9, 14, 20,
@@ -39,7 +40,7 @@ void md5_handler(uint8_t *blocks, size_t block_nb)
     for (size_t i = 0; i < block_nb; i++)
     {
         uint32_t *m = (uint32_t *)(blocks + i * 64);
-		SWAP_ENDIAN_ARRAY(LITTLE_ENDIAN, m, 4, 16);
+		SWAP_ENDIAN_ARRAY(MD5_BLOCK_ENDIAN, m, 4, 16);
         uint32_t h1[4] = { h[0], h[1], h[2], h[3] };
 
         for (size_t j = 0; j < 64; j++)
@@ -79,6 +80,7 @@ void md5_handler(uint8_t *blocks, size_t block_nb)
         for (size_t j = 0; j < 4; j++)
             h[j] += h1[j];
     }
-    SWAP_ENDIAN_ARRAY(BIG_ENDIAN, h, 4, 4);
-    INFO("MD5 hash: %x%x%x%x \n", h[0], h[1], h[2], h[3]);
+	if (copy_hash(hash, hash_size, (uint8_t *) h, MD5_HASH_SIZE))
+		return (1);
+	return (0);
 }

@@ -1,10 +1,16 @@
 #include <ft_ssl_md5.h>
 
-int get_endian()
-{
-    unsigned int i = 1;
-    char *c;
+static int *get_crt_endianess(void) {
+	static int crt_endian = -1;
+	if (crt_endian == -1) {
+		unsigned int i = 1;
+		char *c = (char *) &i;
+		crt_endian = (*c == 1 ? LITTLE_ENDIAN : BIG_ENDIAN);
+	}
+	return &crt_endian;
+}
 
-    c = (char *) &i;
-	return (*c == 1 ? LITTLE_ENDIAN : BIG_ENDIAN);
+int get_endian(void)
+{
+    return *get_crt_endianess();
 }

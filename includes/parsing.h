@@ -11,8 +11,8 @@
 
 // ---------------------- COMMANDS -------------------
 
-void	md5_handler(void);
-void	sha256_handler(void);
+void	md5_handler(uint8_t*, size_t);
+void	sha256_handler(uint8_t*, size_t);
 
 #define COMMAND_NB 2
 #define COMMANDS { \
@@ -23,7 +23,7 @@ void	sha256_handler(void);
 typedef struct s_command
 {
 	char	*name;
-	void	(*hash_algorithm)(void);
+	void	(*hash_algorithm)(uint8_t*, size_t);
 }	t_command;
 
 // --------------------- FLAGS ----------------------
@@ -65,7 +65,7 @@ typedef struct s_params
 	size_t	string_nb;
 	char 	*files[MAX_FILES];
 	size_t	file_nb;
-	void	(*hash_algorithm)(void);
+	void	(*hash_algorithm)(uint8_t*, size_t);
 } t_params;
 
 // --------------------------------------------------

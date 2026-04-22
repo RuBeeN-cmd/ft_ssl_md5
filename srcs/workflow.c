@@ -1,40 +1,44 @@
 #include <ft_ssl_md5.h>
 
-int	process_hash(uint8_t *input, size_t input_size, int endian) {
-	if (input == NULL || input_size == 0)
+int	process_hash(void (*hash_func)(uint8_t*, size_t), t_input input) {
+	if (input.content == NULL || input.size == 0)
 		return (0);
 	uint8_t *blocks;
 	size_t block_nb;
-	if (get_blocks(input, input_size, &blocks, &block_nb, endian) != 0)
+	if (get_blocks(input, &blocks, &block_nb) != 0)
 		return (1);
 	dbg_print_blocks(blocks, block_nb);
+
+	hash_func(blocks, block_nb);
+
 	free(blocks);
 	return (0);
 }
 
-int	process_stdin(int endian) {
+int	process_stdin(void (*hash_func)(uint8_t*, size_t)) {
 	t_input	stdin;
 	if (read_fd(0, &stdin.content, &stdin.size)) {
 		return (1);
 	}
 	DBG("Ret %d bytes from stdin\n", stdin.size);
-	if (process_hash(stdin.content, stdin.size, endian))
+	if (process_hash(hash_func, stdin))
 		return (1);
 	if (stdin.content)
 		free(stdin.content);
 	return (0);
 }
 
-int	process_strings(char **strings, size_t string_nb, int endian) {
+int	process_strings(void (*hash_func)(uint8_t*, size_t), char **strings, size_t string_nb) {
 	for (size_t i = 0; i < string_nb; i++) {
-		if (process_hash((uint8_t *) strings[i], ft_strlen(strings[i]), endian)) {
+		t_input input = {(uint8_t *) strings[i], ft_strlen(strings[i])};
+		if (process_hash(hash_func, input)) {
 			return (1);
 		}
 	}
 	return (0);
 }
 
-int	process_files(char **files, size_t file_nb, int endian) {
+int	process_files(void (*hash_func)(uint8_t*, size_t), char **files, size_t file_nb) {
 	for (size_t i = 0; i < file_nb; i++) {
 		int fd = open(files[i], O_RDONLY);
 		if (fd == -1) {
@@ -49,7 +53,7 @@ int	process_files(char **files, size_t file_nb, int endian) {
 		}
 		close(fd);
 		DBG("Ret %d bytes from file %s\n", file.size, files[i]);
-		if (process_hash(file.content, file.size, endian)) {
+		if (process_hash(hash_func, file)) {
 			free(file.content);
 			return (1);
 		}
@@ -59,16 +63,16 @@ int	process_files(char **files, size_t file_nb, int endian) {
 	return (0);
 }
 
-int	process_params(t_params *params, int endian) {
-	if (!params->string_nb && !params->file_nb) {
-		if (process_stdin(endian)) {
+int	process_params(t_params *params) {
+	if (params->options & ECHO_STDIN_OPT || (!params->string_nb && !params->file_nb)) {
+		if (process_stdin(params->hash_algorithm)) {
 			return (1);
 		}
 	}
-	if (process_strings(params->strings, params->string_nb, endian)) {
+	if (process_strings(params->hash_algorithm, params->strings, params->string_nb)) {
 		return (1);
 	}
-	if (process_files(params->files, params->file_nb, endian)) {
+	if (process_files(params->hash_algorithm, params->files, params->file_nb)) {
 		return (1);
 	}
 	return (0);

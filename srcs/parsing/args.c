@@ -1,6 +1,6 @@
 #include <parsing.h>
 
-void	(*parse_command(char *cmd))(void) {
+void	(*parse_command(char *cmd))(uint8_t*, size_t) {
 	t_command commands[COMMAND_NB] = COMMANDS;
 
 	for (size_t i = 0; i < COMMAND_NB; i++) {

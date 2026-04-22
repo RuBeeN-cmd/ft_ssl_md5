@@ -13,19 +13,18 @@ void	dbg_print_blocks(uint8_t *block, size_t block_nb)
 	}
 }
 
-int get_blocks(uint8_t *input, size_t input_size, uint8_t **blocks, size_t *block_nb, int endian) {
-	if (input == NULL || input_size == 0)
+int get_blocks(t_input input, uint8_t **blocks, size_t *block_nb) {
+	if (input.content == NULL || input.size == 0)
 		return (1);
-	(void) endian;
-	*block_nb = (input_size + MIN_PADDING_SIZE + LEN_SIZE - 1) / BLOCK_SIZE + 1;
+	*block_nb = (input.size + MIN_PADDING_SIZE + LEN_SIZE - 1) / BLOCK_SIZE + 1;
 	*blocks = ft_calloc(*block_nb, 64);
 	if (*blocks == NULL)
 		return (1);
-	ft_memcpy(*blocks, input, input_size);
+	ft_memcpy(*blocks, input.content, input.size);
 
-	(*blocks)[input_size] = 0x80;
-	if (endian == BIG_ENDIAN)
-		input_size = __builtin_bswap64(input_size);
-	*((uint64_t *) ((*blocks) + *block_nb * BLOCK_SIZE - LEN_SIZE)) = input_size;
+	(*blocks)[input.size] = 0x80;
+	uint64_t	len = input.size * 8;
+	SWAP_ENDIAN(LITTLE_ENDIAN, len, 8);
+	*((uint64_t *) ((*blocks) + *block_nb * BLOCK_SIZE - LEN_SIZE)) = len;
 	return (0);
 }

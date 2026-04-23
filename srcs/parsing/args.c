@@ -87,13 +87,44 @@ int	parse_files(int argc, char *argv[], t_params *params)
 	return (0);
 }
 
-int	parse_args(int argc, char *argv[], t_params *params)
+void	parse_env(char *env[])
 {
-	DBG("Parsing arguments\n");
+	for (size_t i = 0; env[i] != NULL; i++) {
+		if (ft_strncmp(env[i], "NOPREFIX", 8) == 0) {
+			disable_prefix();
+		} else if (ft_strncmp(env[i], "NOCOLOR", 7) == 0) {
+			disable_colors();
+		} else if (ft_strncmp(env[i], "LOGLEVEL", 8) == 0) {
+			char *value = ft_strchr(env[i], '=');
+			if (value != NULL) {
+				*value = '\0';
+				value++;
+				if (!ft_strncmp(value, "debug", 5))
+					set_log_level(LEVEL_DEBUG);
+				else if (!ft_strncmp(value, "info", 4))
+					set_log_level(LEVEL_INFO);
+				else if (!ft_strncmp(value, "warning", 7))
+					set_log_level(LEVEL_WARNING);
+				else if (!ft_strncmp(value, "error", 5))
+					set_log_level(LEVEL_ERROR);
+				else {
+					int log_level = ft_atoi(value);
+					if (log_level >= LEVEL_DEBUG && log_level <= LEVEL_ERROR)
+						set_log_level(log_level);
+				}
+			}
+		}
+	}
+}
+
+int	parse_args(int argc, char *argv[], char *env[], t_params *params)
+{
 	if (argc == 1) {
 		USAGE(argv[0]);
 		return (1);
 	}
+
+	parse_env(env);
 
 	if (parse_command(argv[1], &params->hash_command) != 0)
 		return (1);

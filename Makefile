@@ -28,7 +28,7 @@ SRC = main.c \
 	print.c
 
 CC = clang
-CFLAGS = -Wall -Werror -Wextra -DNOLOG
+CFLAGS = -Wall -Werror -Wextra
 INC = -Iincludes
 
 # ------------- LIBS ----------------

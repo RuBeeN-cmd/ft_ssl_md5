@@ -22,12 +22,32 @@ int	process_stdin(int options, t_command *command) {
 	if (read_fd(0, &stdin.content, &stdin.size)) {
 		return (1);
 	}
+	if (!stdin.size) {
+		return (1);
+	}
 	DBG("Ret %d bytes from stdin\n", stdin.size);
 
 	t_u8_array hash;
 	if (process_hash(command, stdin, &hash))
 		return (1);
-	print_hash("stdin", options, hash);
+
+	if (options & ECHO_STDIN_OPT) {
+		if (options & QUIET_OPT) {
+			print_stdin_alone(stdin);
+		} else {
+			print_stdin_inline(stdin);
+		}
+	} else {
+		if (!(options & QUIET_OPT)) {
+			print_stdin_litteral_inline(stdin);
+		}
+	}
+	if (options & QUIET_OPT) {
+		print_hash(hash, 1);
+	} else {
+		print_hash(hash, 0);
+	}
+
 	if (hash.content)
 		free(hash.content);
 	if (stdin.content)
@@ -36,13 +56,26 @@ int	process_stdin(int options, t_command *command) {
 }
 
 int	process_strings(int options, t_command *command, char **strings, size_t string_nb) {
+	(void) options;
 	for (size_t i = 0; i < string_nb; i++) {
 		t_u8_array input = {(uint8_t *) strings[i], ft_strlen(strings[i])};
-
 		t_u8_array hash;
 		if (process_hash(command, input, &hash))
 			return (1);
-		print_hash(strings[i], options, hash);
+
+		if (!(options & QUIET_OPT)) {
+			print_cmd_string_inline(command->name, strings[i]);
+		}
+		if (options & QUIET_OPT) {
+			print_hash(hash, 1);
+		} else {
+			print_hash(hash, 0);
+		}
+
+		if (options & REVERSE_OPT) {
+			print_suffix_string(strings[i]);
+		}
+
 		if (hash.content)
 			free(hash.content);
 	}
@@ -53,14 +86,14 @@ int	process_files(int options, t_command *command, char **files, size_t file_nb)
 	for (size_t i = 0; i < file_nb; i++) {
 		int fd = open(files[i], O_RDONLY);
 		if (fd == -1) {
-			ERR("ft_ssl: Error: failed to open file %s\n", files[i]);
-			return (1);
+			ERR("ft_ssl: %s: %s: No such file or directory\n", command->name, files[i]);
+			continue;
 		}
 		t_u8_array	file;
 		if (read_fd(fd, &file.content, &file.size)) {
 			close(fd);
 			ERR("ft_ssl: Error: failed to read file %s\n", files[i]);
-			return (1);
+			continue;
 		}
 		close(fd);
 		DBG("Ret %d bytes from file %s\n", file.size, files[i]);
@@ -68,9 +101,22 @@ int	process_files(int options, t_command *command, char **files, size_t file_nb)
 		t_u8_array hash;
 		if (process_hash(command, file, &hash)) {
 			free(file.content);
-			return (1);
+			continue;
 		}
-		print_hash(files[i], options, hash);
+
+		if (!(options & QUIET_OPT)) {
+			print_cmd_file_inline(command->name, files[i]);
+		}
+		if (options & QUIET_OPT) {
+			print_hash(hash, 1);
+		} else {
+			print_hash(hash, 0);
+		}
+
+		// if (options & REVERSE_OPT) {
+		// 	print_suffix_string(strings[i]);
+		// }
+
 		if (hash.content)
 			free(hash.content);
 

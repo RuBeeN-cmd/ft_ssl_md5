@@ -18,30 +18,6 @@ char	*get_hash_str(t_u8_array hash) {
 	return (str);
 }
 
-void	print_stdin_alone(t_u8_array stdin) {
-	if (!stdin.size)
-		return;
-	if (stdin.content[stdin.size - 1] == '\n') {
-		stdin.content[stdin.size - 1] = '\0';
-		stdin.size--;
-	}
-	INFO("%s", get_color(COLOR_CYAN));
-	write(1, stdin.content, stdin.size);
-	LOG(0, LEVEL_INFO, "%s\n", get_color(COLOR_RESET));
-}
-
-void	print_stdin_inline(t_u8_array stdin) {
-	if (!stdin.size)
-		return;
-	if (stdin.content[stdin.size - 1] == '\n') {
-		stdin.content[stdin.size - 1] = '\0';
-		stdin.size--;
-	}
-	INFO("(\"%s", get_color(COLOR_CYAN));
-	write(1, stdin.content, stdin.size);
-	LOG(0, LEVEL_INFO, "%s\")= ", get_color(COLOR_RESET));
-}
-
 void	ft_strtoupper(char *str, char *upper_str, size_t string_size) {
 	if (!str || !upper_str || string_size == 0)
 		return ;
@@ -55,31 +31,44 @@ void	ft_strtoupper(char *str, char *upper_str, size_t string_size) {
 		upper_str[string_size - 1] = '\0';
 }
 
+// ------------------------------------------------
+
+void	print_stdin_alone(t_u8_array stdin) {
+	if (stdin.size && stdin.content[stdin.size - 1] == '\n') {
+		stdin.content[stdin.size - 1] = '\0';
+		stdin.size--;
+	}
+	INFO("%s", get_color(COLOR_CYAN));
+	write(1, stdin.content, stdin.size);
+	LOG(0, LEVEL_INFO, "%s\n", get_color(COLOR_RESET));
+}
+
+void	print_stdin_inline(t_u8_array stdin) {
+	if (stdin.size && stdin.content[stdin.size - 1] == '\n') {
+		stdin.content[stdin.size - 1] = '\0';
+		stdin.size--;
+	}
+	INFO("(\"%s", get_color(COLOR_CYAN));
+	write(1, stdin.content, stdin.size);
+	LOG(0, LEVEL_INFO, "%s\")= ", get_color(COLOR_RESET));
+}
+
 void	print_stdin_litteral_inline() {
 	INFO("(%sstdin%s)= ", get_color(COLOR_CYAN), get_color(COLOR_RESET));
 }
 
-
-void	print_cmd_string_inline(char *cmd, char *string) {
+void	print_cmd_inline(char *cmd, char *string, int has_quotes) {
 	char	upper_cmd[MAX_CMD_LEN];
 	ft_strtoupper(cmd, upper_cmd, sizeof(upper_cmd));
-	INFO("%s%s%s (\"%s%s%s\") = ", get_color(COLOR_GREEN), upper_cmd, get_color(COLOR_RESET),
-		get_color(COLOR_CYAN), string, get_color(COLOR_RESET));
+
+	char	*quotes = has_quotes ? "\"" : "";
+	INFO("%s%s%s (%s%s%s%s%s) = ", get_color(COLOR_GREEN), upper_cmd, get_color(COLOR_RESET),
+		quotes, get_color(COLOR_CYAN), string, get_color(COLOR_RESET), quotes);
 }
 
-void	print_suffix_string(char *string) {
-	LOG(0, LEVEL_INFO, " \"%s%s%s\"\n", get_color(COLOR_CYAN), string, get_color(COLOR_RESET));
-}
-
-void	print_cmd_file_inline(char *cmd, char *file) {
-	char	upper_cmd[MAX_CMD_LEN];
-	ft_strtoupper(cmd, upper_cmd, sizeof(upper_cmd));
-	INFO("%s%s%s (%s%s%s) = ", get_color(COLOR_GREEN), upper_cmd, get_color(COLOR_RESET),
-		get_color(COLOR_CYAN), file, get_color(COLOR_RESET));
-}
-
-void	print_suffix_file(char *file) {
-	LOG(0, LEVEL_INFO, " %s%s%s\n", get_color(COLOR_CYAN), file, get_color(COLOR_RESET));
+void	print_suffix(char *string, int has_quotes) {
+	char	*quotes = has_quotes ? "\"" : "";
+	LOG(0, LEVEL_INFO, " %s%s%s%s%s\n", quotes, get_color(COLOR_CYAN), string, get_color(COLOR_RESET), quotes);
 }
 
 

@@ -11,7 +11,7 @@
 #define BLOCK_SIZE			64
 
 // workflow.c
-int	process_params(t_params *params);
+void	process_params(t_params *params);
 
 // read.c
 int	read_fd(int fd, uint8_t **result, size_t *size);
@@ -26,10 +26,8 @@ void	dbg_print_blocks(uint8_t *block, size_t block_nb);
 void	print_stdin_alone(t_u8_array stdin);
 void	print_stdin_inline(t_u8_array stdin);
 void	print_stdin_litteral_inline();
-void	print_cmd_string_inline(char *cmd, char *string);
-void	print_cmd_file_inline(char *cmd, char *file);
+void	print_cmd_inline(char *cmd, char *string, int quotes);
 void	print_hash(t_u8_array hash, int prefix, int nl);
-void	print_suffix_string(char *string);
-void	print_suffix_file(char *file);
+void	print_suffix(char *string, int has_quotes);
 
 #endif

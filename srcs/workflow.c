@@ -1,8 +1,6 @@
 #include <ft_ssl_md5.h>
 
 int	process_hash(t_command *command, t_u8_array input, t_u8_array *output) {
-	if (input.content == NULL || input.size == 0)
-		return (0);
 	uint8_t *blocks;
 	size_t block_nb;
 	if (get_blocks(input, &blocks, &block_nb, command->block_endian) != 0)
@@ -18,11 +16,8 @@ int	process_hash(t_command *command, t_u8_array input, t_u8_array *output) {
 }
 
 int	process_stdin(int options, t_command *command) {
-	t_u8_array	stdin;
+	t_u8_array	stdin = { 0 };
 	if (read_fd(0, &stdin.content, &stdin.size)) {
-		return (1);
-	}
-	if (!stdin.size) {
 		return (1);
 	}
 	DBG("Ret %d bytes from stdin\n", stdin.size);
@@ -39,14 +34,10 @@ int	process_stdin(int options, t_command *command) {
 		}
 	} else {
 		if (!(options & QUIET_OPT)) {
-			print_stdin_litteral_inline(stdin);
+			print_stdin_litteral_inline();
 		}
 	}
-	if (options & QUIET_OPT) {
-		print_hash(hash, 1);
-	} else {
-		print_hash(hash, 0);
-	}
+	print_hash(hash, (options & QUIET_OPT) > 0, 1);
 
 	if (hash.content)
 		free(hash.content);
@@ -63,16 +54,13 @@ int	process_strings(int options, t_command *command, char **strings, size_t stri
 		if (process_hash(command, input, &hash))
 			return (1);
 
-		if (!(options & QUIET_OPT)) {
-			print_cmd_string_inline(command->name, strings[i]);
+		if (!(options & REVERSE_OPT)) {
+			if (!(options & QUIET_OPT)) {
+				print_cmd_string_inline(command->name, strings[i]);
+			}
 		}
-		if (options & QUIET_OPT) {
-			print_hash(hash, 1);
-		} else {
-			print_hash(hash, 0);
-		}
-
-		if (options & REVERSE_OPT) {
+		print_hash(hash, (options & QUIET_OPT) > 0 || (options & REVERSE_OPT) > 0, (options & REVERSE_OPT) == 0 || (options & QUIET_OPT) > 0);
+		if (options & REVERSE_OPT && !(options & QUIET_OPT)) {
 			print_suffix_string(strings[i]);
 		}
 
@@ -104,18 +92,15 @@ int	process_files(int options, t_command *command, char **files, size_t file_nb)
 			continue;
 		}
 
-		if (!(options & QUIET_OPT)) {
-			print_cmd_file_inline(command->name, files[i]);
+		if (!(options & REVERSE_OPT)) {
+			if (!(options & QUIET_OPT)) {
+				print_cmd_file_inline(command->name, files[i]);
+			}
 		}
-		if (options & QUIET_OPT) {
-			print_hash(hash, 1);
-		} else {
-			print_hash(hash, 0);
+		print_hash(hash, (options & QUIET_OPT) > 0 || (options & REVERSE_OPT) > 0, (options & REVERSE_OPT) == 0 || (options & QUIET_OPT) > 0);
+		if (options & REVERSE_OPT && !(options & QUIET_OPT)) {
+			print_suffix_file(files[i]);
 		}
-
-		// if (options & REVERSE_OPT) {
-		// 	print_suffix_string(strings[i]);
-		// }
 
 		if (hash.content)
 			free(hash.content);

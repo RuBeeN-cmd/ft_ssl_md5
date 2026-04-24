@@ -19,13 +19,20 @@ char	*get_hash_str(t_u8_array hash) {
 }
 
 void	print_stdin_alone(t_u8_array stdin) {
+	if (!stdin.size)
+		return;
+	if (stdin.content[stdin.size - 1] == '\n') {
+		stdin.content[stdin.size - 1] = '\0';
+		stdin.size--;
+	}
 	INFO("%s", get_color(COLOR_CYAN));
 	write(1, stdin.content, stdin.size);
 	LOG(0, LEVEL_INFO, "%s\n", get_color(COLOR_RESET));
 }
 
 void	print_stdin_inline(t_u8_array stdin) {
-
+	if (!stdin.size)
+		return;
 	if (stdin.content[stdin.size - 1] == '\n') {
 		stdin.content[stdin.size - 1] = '\0';
 		stdin.size--;
@@ -35,16 +42,28 @@ void	print_stdin_inline(t_u8_array stdin) {
 	LOG(0, LEVEL_INFO, "%s\")= ", get_color(COLOR_RESET));
 }
 
+void	ft_strtoupper(char *str, char *upper_str, size_t string_size) {
+	if (!str || !upper_str || string_size == 0)
+		return ;
+	for (size_t i = 0; str[i] && i < string_size - 1; i++) {
+		upper_str[i] = ft_toupper(str[i]);
+	}
+	size_t	len = ft_strlen(str);
+	if (len < string_size - 1)
+		upper_str[len] = '\0';
+	else
+		upper_str[string_size - 1] = '\0';
+}
+
 void	print_stdin_litteral_inline() {
-	INFO("(stdin)= ");
+	INFO("(%sstdin%s)= ", get_color(COLOR_CYAN), get_color(COLOR_RESET));
 }
 
 
-
-
 void	print_cmd_string_inline(char *cmd, char *string) {
-	// TODO: UPPER CMD
-	INFO("%s%s%s (\"%s%s%s\") = ", get_color(COLOR_GREEN), cmd, get_color(COLOR_RESET),
+	char	upper_cmd[MAX_CMD_LEN];
+	ft_strtoupper(cmd, upper_cmd, sizeof(upper_cmd));
+	INFO("%s%s%s (\"%s%s%s\") = ", get_color(COLOR_GREEN), upper_cmd, get_color(COLOR_RESET),
 		get_color(COLOR_CYAN), string, get_color(COLOR_RESET));
 }
 
@@ -52,22 +71,20 @@ void	print_suffix_string(char *string) {
 	LOG(0, LEVEL_INFO, " \"%s%s%s\"\n", get_color(COLOR_CYAN), string, get_color(COLOR_RESET));
 }
 
-
-
-
 void	print_cmd_file_inline(char *cmd, char *file) {
-	// TODO: UPPER CMD
-	INFO("%s%s%s (%s%s%s) = ", get_color(COLOR_GREEN), cmd, get_color(COLOR_RESET),
+	char	upper_cmd[MAX_CMD_LEN];
+	ft_strtoupper(cmd, upper_cmd, sizeof(upper_cmd));
+	INFO("%s%s%s (%s%s%s) = ", get_color(COLOR_GREEN), upper_cmd, get_color(COLOR_RESET),
 		get_color(COLOR_CYAN), file, get_color(COLOR_RESET));
 }
 
 void	print_suffix_file(char *file) {
-	LOG(0, LEVEL_INFO, " %s%s%s", get_color(COLOR_CYAN), file, get_color(COLOR_RESET));
+	LOG(0, LEVEL_INFO, " %s%s%s\n", get_color(COLOR_CYAN), file, get_color(COLOR_RESET));
 }
 
 
 
-void	print_hash(t_u8_array hash, int prefix) {
+void	print_hash(t_u8_array hash, int prefix, int nl) {
 	if (!hash.content || hash.size == 0)
 		return;
 	char	*hash_str = get_hash_str(hash);
@@ -76,6 +93,7 @@ void	print_hash(t_u8_array hash, int prefix) {
 	if (prefix)
 		INFO("");
 	write(1, hash_str, ft_strlen(hash_str));
-	LOG(0, LEVEL_INFO, "\n");
+	if (nl)
+		LOG(0, LEVEL_INFO, "\n");
 	free(hash_str);
 }

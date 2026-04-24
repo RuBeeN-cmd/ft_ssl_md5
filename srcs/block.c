@@ -15,8 +15,6 @@ void	dbg_print_blocks(uint8_t *block, size_t block_nb)
 }
 
 int get_blocks(t_u8_array input, uint8_t **blocks, size_t *block_nb, int block_endian) {
-	if (input.content == NULL || input.size == 0)
-		return (1);
 	*block_nb = (input.size + MIN_PADDING_SIZE + LEN_SIZE - 1) / BLOCK_SIZE + 1;
 	*blocks = ft_calloc(*block_nb, 64);
 	if (*blocks == NULL)

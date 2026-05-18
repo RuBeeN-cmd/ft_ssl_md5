@@ -3,7 +3,7 @@
 int	process_hash(t_command *command, t_u8_array input, t_u8_array *output) {
 	uint8_t *blocks;
 	size_t block_nb;
-	if (get_blocks(input, &blocks, &block_nb, command->block_endian) != 0)
+	if (get_blocks(input, &blocks, &block_nb, command->block_endian, command->block_len_size) != 0)
 		return (1);
 	dbg_print_blocks(blocks, block_nb);
 
@@ -22,9 +22,17 @@ int	process_stdin(int options, t_command *command) {
 	}
 	DBG("Ret %d bytes from stdin\n", stdin.size);
 
-	t_u8_array hash;
-	if (process_hash(command, stdin, &hash))
+	t_u8_array hash = {};
+	if (process_hash(command, stdin, &hash)) {
+		if (stdin.content)
+			free(stdin.content);
 		return (1);
+	}
+	if (!hash.content || !hash.size) {
+		if (stdin.content)
+			free(stdin.content);
+		return (1);
+	}
 	if (options & ECHO_STDIN_OPT) {
 		if (options & QUIET_OPT) {
 			print_stdin_alone(stdin);
@@ -48,8 +56,10 @@ int	process_stdin(int options, t_command *command) {
 int	process_string(char *string, t_command *command, int options) {
 	t_u8_array input = {(uint8_t *) string, ft_strlen(string)};
 
-	t_u8_array hash;
+	t_u8_array hash = {};
 	if (process_hash(command, input, &hash))
+		return (1);
+	if (!hash.content || !hash.size)
 		return (1);
 	if (!(options & REVERSE_OPT) && !(options & QUIET_OPT)) {
 		print_cmd_inline(command->name, string, 1);
@@ -87,11 +97,13 @@ int process_file(char *filename, t_command *command, int options) {
 	close(fd);
 	DBG("Ret %d bytes from file %s\n", file.size, filename);
 
-	t_u8_array hash;
+	t_u8_array hash = {};
 	if (process_hash(command, file, &hash)) {
 		free(file.content);
 		return (1);
 	}
+	if (!hash.content || !hash.size)
+		return (1);
 	if (!(options & REVERSE_OPT) && !(options & QUIET_OPT)) {
 		print_cmd_inline(command->name, filename, 0);
 	}

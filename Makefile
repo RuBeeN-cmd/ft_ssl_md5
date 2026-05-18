@@ -24,11 +24,12 @@ SRC = main.c \
 	algorithms/common.c \
 	algorithms/md5.c \
 	algorithms/sha256.c \
+	algorithms/whirlpool.c \
 	utils/endian.c \
 	print.c
 
 CC = clang
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -g3
 INC = -Iincludes
 
 # ------------- LIBS ----------------

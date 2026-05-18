@@ -14,16 +14,19 @@ void	dbg_print_blocks(uint8_t *block, size_t block_nb)
 	}
 }
 
-int get_blocks(t_u8_array input, uint8_t **blocks, size_t *block_nb, int block_endian) {
-	*block_nb = (input.size + MIN_PADDING_SIZE + LEN_SIZE - 1) / BLOCK_SIZE + 1;
+int get_blocks(t_u8_array input, uint8_t **blocks, size_t *block_nb, int block_endian, size_t len_bit_nb) {
+	size_t	len_bytes_nb = (len_bit_nb + 7) / 8;
+	*block_nb = (input.size + MIN_PADDING_SIZE + len_bytes_nb - 1) / BLOCK_SIZE + 1;
 	*blocks = ft_calloc(*block_nb, 64);
 	if (*blocks == NULL)
 		return (1);
 	ft_memcpy(*blocks, input.content, input.size);
 
 	(*blocks)[input.size] = 0x80;
+
+	DBG("Len bytes nb: %d\n", len_bytes_nb);
 	uint64_t	len = input.size * 8;
 	SWAP_ENDIAN(block_endian, len, 8);
-	*((uint64_t *) ((*blocks) + *block_nb * BLOCK_SIZE - LEN_SIZE)) = len;
+	*((uint64_t *) ((*blocks) + *block_nb * BLOCK_SIZE - len_bytes_nb)) = len;
 	return (0);
 }

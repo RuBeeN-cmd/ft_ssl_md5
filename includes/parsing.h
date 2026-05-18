@@ -7,15 +7,17 @@
 
 #include <algorithms/md5.h>
 #include <algorithms/sha256.h>
+#include <algorithms/whirlpool.h>
 
 #define USAGE(program_name) ERR("Usage: %s <command> [flags] [file/string]\n", program_name)
 
 // ------------------------ COMMANDS ----------------------
 
-#define COMMAND_NB 2
+#define COMMAND_NB 3
 #define COMMANDS { \
-	(t_command) {MD5_NAME, md5_handler, LITTLE_ENDIAN, MD5_HASH_SIZE}, \
-	(t_command) {SHA256_NAME, sha256_handler, BIG_ENDIAN, SHA256_HASH_SIZE} \
+	(t_command) {MD5_NAME, md5_handler, LITTLE_ENDIAN, MD5_BLOCK_LEN_SIZE, MD5_HASH_SIZE}, \
+	(t_command) {SHA256_NAME, sha256_handler, BIG_ENDIAN, SHA256_BLOCK_LEN_SIZE, SHA256_HASH_SIZE}, \
+	(t_command) {WHIRLPOOL_NAME, whirlpool_handler, BIG_ENDIAN, WHIRLPOOL_BLOCK_LEN_SIZE, WHIRLPOOL_HASH_SIZE} \
 }
 
 typedef struct s_command
@@ -23,6 +25,7 @@ typedef struct s_command
 	char	*name;
 	int		(*hash_algorithm)(uint8_t*, size_t, uint8_t**, size_t*);
 	int		block_endian;
+	int		block_len_size;
 	int		hash_size;
 }	t_command;
 

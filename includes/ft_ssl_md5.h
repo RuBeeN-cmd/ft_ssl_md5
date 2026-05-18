@@ -17,7 +17,7 @@ void	process_params(t_params *params);
 int	read_fd(int fd, uint8_t **result, size_t *size);
 
 // block.c
-int		get_blocks(t_u8_array input, uint8_t **blocks, size_t *block_nb, int block_endian);
+int 	get_blocks(t_u8_array input, uint8_t **blocks, size_t *block_nb, int block_endian, size_t len_bit_nb);
 void	dbg_print_blocks(uint8_t *block, size_t block_nb);
 
 // print.c

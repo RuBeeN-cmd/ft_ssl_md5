@@ -3,9 +3,10 @@
 
 #include <algorithms/common.h>
 
-#define SHA256_NAME			"sha256"
-#define SHA256_HASH_SIZE	(8 * sizeof(uint32_t))
-#define SHA256_BLOCK_ENDIAN	BIG_ENDIAN
+#define SHA256_NAME				"sha256"
+#define SHA256_HASH_SIZE		(8 * sizeof(uint32_t))
+#define SHA256_BLOCK_LEN_SIZE	(64)
+#define SHA256_BLOCK_ENDIAN		BIG_ENDIAN
 
 int sha256_handler(uint8_t *blocks, size_t block_nb, uint8_t **hash, size_t *hash_size);
 

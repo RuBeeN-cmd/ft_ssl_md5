@@ -6,8 +6,11 @@ int main(int argc, char *argv[], char *env[])
 
 	set_log_level(LEVEL_DEBUG);
 
-	if (parse_args(argc, argv, env, &params) != 0)
+	int ret = parse_args(argc, argv, env, &params);
+	if (ret < 0)
 		return (1);
+	if (ret > 0)
+		return (0);
 
 	process_params(&params);
 	return (0);

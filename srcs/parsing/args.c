@@ -117,40 +117,64 @@ void	parse_env(char *env[])
 	}
 }
 
+int	get_command_from_stdin(t_command *command)
+{
+	char buf[64] = {};
+
+	int invalid_command = 1;
+	t_command cmd = {};
+
+	while (invalid_command == 1) {
+		INFO("%s> ", "ft_ssl");
+		int ret = read(0, buf, 64);
+		if (ret > 0) {
+			buf[ret] = 0;
+		} else {
+			LOG(0, LEVEL_INFO, "\n");
+			return (1);
+		}
+		invalid_command = parse_command(buf, &cmd);
+	}
+	*command = cmd;
+	return (0);
+}
+
 int	parse_args(int argc, char *argv[], char *env[], t_params *params)
 {
-	if (argc == 1) {
-		USAGE(argv[0]);
-		return (1);
-	}
-
 	parse_env(env);
 
-	if (parse_command(argv[1], &params->hash_command) != 0)
-		return (1);
 
-	DBG("Running command "ANSI_GREEN"%s"ANSI_RESET"\n", argv[1]);
-
-	argc -= 2;
-	argv += 2;
-	int ret = 0;
-	if (argc > 0) {
-		ret = parse_flags(argc, argv, params);
-		if (ret == -1)
+	argc -= 1;
+	argv += 1;
+	if (argc == 0) {
+		int ret = get_command_from_stdin(&params->hash_command);
+		if (ret != 0)
 			return (1);
+	} else if (parse_command(argv[0], &params->hash_command) != 0) {
+		return (-1);
 	}
+	DBG("Running command "ANSI_GREEN"%s"ANSI_RESET"\n", params->hash_command.name);
+
+	argc -= 1;
+	argv += 1;
+	if (argc <= 0)
+		goto exit;
+
+	int ret = parse_flags(argc, argv, params);
+	if (ret == -1)
+		return (-1);
 
 	argc -= ret;
 	argv += ret;
-	if (argc > 0) {
-		if (parse_files(argc, argv, params)) {
-			return (1);
-		}
-	}
+	if (argc <= 0)
+		goto exit;
 
-	dbg_show_flags(params);
-	dbg_show_strings(params);
-	dbg_show_files(params);
+	if (parse_files(argc, argv, params))
+		return (-1);
 
+	exit:
+		dbg_show_flags(params);
+		dbg_show_strings(params);
+		dbg_show_files(params);
 	return (0);
 }
